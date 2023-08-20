@@ -20,7 +20,9 @@ embeddings = OpenAIEmbeddings()
 
 # Directory containing PDFs
 pdf_directory = '/Users/angad/DFG/data'
-pdf_files = [f"{i}.pdf" for i in range(1, len(os.listdir(pdf_directory)) + 1)]
+
+# Get all PDF files in the directory
+pdf_files = [f for f in os.listdir(pdf_directory) if f.endswith('.pdf')]
 
 # Dictionary to store Chroma vectorstores for each PDF
 stores = {}
@@ -31,14 +33,11 @@ for pdf_file in pdf_files:
     store_name = pdf_file.replace('.pdf', '')
     stores[store_name] = Chroma.from_documents(pages, embeddings, collection_name=store_name)
 
-# Use the first vectorstore from the stores dictionary as a placeholder
-placeholder_vectorstore = next(iter(stores.values()))
-
-# Create a default VectorStoreInfo object using the placeholder vectorstore
+# Create a default VectorStoreInfo object
 default_vectorstore_info = VectorStoreInfo(
     name="default_store",
     description="Default store for multiple PDFs",
-    vectorstore=placeholder_vectorstore
+    vectorstore=next(iter(stores.values()))  # Use the first vectorstore as a placeholder
 )
 
 # Create the agent executor for the LLM using the default VectorStoreInfo
@@ -50,7 +49,7 @@ agent_executor = create_vectorstore_agent(
 )
 
 # Streamlit interface
-st.title('🦜🔗 GPT Investment Banker')
+st.title('Decentralised Fisheries Governance')
 prompt = st.text_input('Input your prompt here')
 
 # When user provides input
