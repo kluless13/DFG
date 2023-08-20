@@ -12,7 +12,7 @@ from langchain.agents.agent_toolkits import (
 )
 
 # Set OpenAI API key
-os.environ['OPENAI_API_KEY'] = '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'
+os.environ['OPENAI_API_KEY'] = '-'
 
 # Initialize OpenAI LLM and embeddings with adjusted parameters for broader answers
 llm = OpenAI(temperature=0.2, verbose=True, max_tokens=500)
