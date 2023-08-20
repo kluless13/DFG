@@ -1,6 +1,5 @@
 # Import necessary libraries and modules
 import os
-import re
 from os import listdir
 from os.path import isfile, join
 from langchain.llms import OpenAI
@@ -14,40 +13,40 @@ from langchain.agents.agent_toolkits import (
     VectorStoreInfo
 )
 
-
 # Set OpenAI API key
 os.environ['OPENAI_API_KEY'] = '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'
 
-# Initialize OpenAI LLM and embeddings
-llm = OpenAI(temperature=0.1, verbose=True)
+# Initialize OpenAI LLM and embeddings with adjusted parameters for broader answers
+llm = OpenAI(temperature=0.2, verbose=True, max_tokens=500)
 embeddings = OpenAIEmbeddings()
 
 # Directory containing PDFs
 pdf_directory = '/Users/angad/DFG/data'
 
-# Get all PDF files in the directory
-all_files = [f for f in listdir(pdf_directory) if isfile(join(pdf_directory, f))]
-pdf_files = [f for f in all_files if f.endswith('.pdf')]
+# Get all renamed PDF files in the directory
+pdf_files = [f"{i}.pdf" for i in range(1, len(os.listdir(pdf_directory)) + 1)]
 
 # Dictionary to store Chroma vectorstores for each PDF
 stores = {}
 
-# Load and process each PDF, storing pages in separate vector databases
 for pdf_file in pdf_files:
     loader = PyPDFLoader(join(pdf_directory, pdf_file))
     pages = loader.load_and_split()
     store_name = pdf_file.replace('.pdf', '')
     stores[store_name] = Chroma.from_documents(pages, embeddings, collection_name=store_name)
 
-# Create vectorstore info object and toolkit
-vectorstore_info = VectorStoreInfo(
-    name=store_name,
-    description=f"{store_name} as a PDF",
-    vectorstore=stores[store_name]
-)
-toolkit = VectorStoreToolkit(vectorstore_info=vectorstore_info)
+# Use the first vectorstore from the stores dictionary as a placeholder
+placeholder_vectorstore = next(iter(stores.values()))
 
-# Create the agent executor after defining the toolkit
+# Create a default VectorStoreInfo object using the placeholder vectorstore
+default_vectorstore_info = VectorStoreInfo(
+    name="default_store",
+    description="Default store for multiple PDFs",
+    vectorstore=placeholder_vectorstore
+)
+
+# Create the agent executor for the LLM using the default VectorStoreInfo
+toolkit = VectorStoreToolkit(vectorstore_info=default_vectorstore_info)
 agent_executor = create_vectorstore_agent(
     llm=llm,
     toolkit=toolkit,
