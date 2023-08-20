@@ -14,13 +14,6 @@ from langchain.agents.agent_toolkits import (
     VectorStoreInfo
 )
 
-# Define the sanitize_name function to ensure valid collection names
-def sanitize_name(name):
-    # Replace non-alphanumeric characters with underscores
-    sanitized = re.sub('[^a-zA-Z0-9]', '_', name)
-    # Ensure the length is within a reasonable character limit (let's use 50 for safety)
-    return sanitized[:50]
-
 
 # Set OpenAI API key
 os.environ['OPENAI_API_KEY'] = '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'
@@ -43,7 +36,7 @@ stores = {}
 for pdf_file in pdf_files:
     loader = PyPDFLoader(join(pdf_directory, pdf_file))
     pages = loader.load_and_split()
-    store_name = sanitize_name(pdf_file.replace('.pdf', ''))
+    store_name = pdf_file.replace('.pdf', '')
     stores[store_name] = Chroma.from_documents(pages, embeddings, collection_name=store_name)
 
 # Create vectorstore info object and toolkit
