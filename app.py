@@ -1,7 +1,5 @@
 # Import necessary libraries and modules
 import os
-from os import listdir
-from os.path import isfile, join
 from langchain.llms import OpenAI
 from langchain.embeddings import OpenAIEmbeddings
 import streamlit as st
@@ -22,15 +20,13 @@ embeddings = OpenAIEmbeddings()
 
 # Directory containing PDFs
 pdf_directory = '/Users/angad/DFG/data'
-
-# Get all renamed PDF files in the directory
 pdf_files = [f"{i}.pdf" for i in range(1, len(os.listdir(pdf_directory)) + 1)]
 
 # Dictionary to store Chroma vectorstores for each PDF
 stores = {}
 
 for pdf_file in pdf_files:
-    loader = PyPDFLoader(join(pdf_directory, pdf_file))
+    loader = PyPDFLoader(os.path.join(pdf_directory, pdf_file))
     pages = loader.load_and_split()
     store_name = pdf_file.replace('.pdf', '')
     stores[store_name] = Chroma.from_documents(pages, embeddings, collection_name=store_name)
